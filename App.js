@@ -10,7 +10,8 @@ function HomeScreen({ navigation, route }) {
   const [datas, setDatas] = useState([])
   const [searchResult, setSearchResult] = useState(datas)
   const [loading,setLoading] = useState(false)
-  const dataLits= (page=0)=>{
+  const page = useRef(0)
+  const dataLits= (page)=>{
     axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${page}&limit=10`)
   .then(response => {
     setDatas([...datas, ...response.data.results])
@@ -42,8 +43,9 @@ function HomeScreen({ navigation, route }) {
   const handleItemPress = (item) => {
     navigation.navigate('Detail', { item })
   }
-  const onEndReachedHandler = ()=>{
-    dataLits(datas.length+10)
+  const onEndReachedHandler = (pageCurrent)=>{
+    dataLits(pageCurrent+1)
+    console.log(datas.length);
     setLoading(true)
   }
   return (
@@ -57,7 +59,7 @@ function HomeScreen({ navigation, route }) {
         keyboardShouldPersistTaps={'always'}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 50, paddingTop: 0 }}
         data={searchResult}
-        onEndReached={onEndReachedHandler}
+        onEndReached={()=>onEndReachedHandler(page.current)}
         onEndReachedThreshold={0.5}
         renderItem={({ item }) => {
           return (
